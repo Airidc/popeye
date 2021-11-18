@@ -1,0 +1,44 @@
+version: "3.4"
+services:
+  client:
+    container_name: frontend
+    stdin_open: true
+    build:
+      context: ./frontend
+    depends_on:
+      - server
+    volumes:
+      - ./frontend:/app/frontend
+      - /app/frontend/node_modules
+    ports:
+      - 4000:4000
+
+  server:
+    container_name: backend
+    stdin_open: true
+    build:
+      context: ./backend
+    depends_on:
+      - database
+    volumes:
+      - ./backend:/app/backend
+      - /app/backend/node_modules
+    ports:
+      - 5000:5000
+    environment:
+      - PORT=5000
+      - MONGO_URI=mongodb://database:27017/routes
+    links:
+      - database
+
+  database:
+    image: mongo:latest
+    container_name: database
+    ports:
+      - 27017:27017
+    volumes:
+      - db:/data/db
+    environment:
+      - MONGO_INITDB_DATABASE=routes
+volumes:
+  db:
