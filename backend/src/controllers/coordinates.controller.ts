@@ -1,15 +1,21 @@
-import { BasicSocketController } from "src/interface";
+import { BasicSocketController } from "../interface";
 import * as socketio from "socket.io";
-import { GeoService } from "src/services";
+import { GeoService } from "../services";
 
 export class CoordinatesController implements BasicSocketController {
-  constructor() {}
+  io: socketio.Server;
+  socket: socketio.Socket;
 
-  registerEvents(socket: socketio.Socket) {
+  constructor(io: socketio.Server, socket: socketio.Socket) {
+    this.io = io;
+    this.socket = socket;
+  }
+
+  registerHandlers() {
     try {
-      socket.on("getCoordinates", this.getCoordinates);
+      this.socket.on("getCoordinates", this.getCoordinates);
     } catch (error) {
-      socket.on("error", () => error);
+      this.socket.on("error", () => error);
     }
   }
 
@@ -18,8 +24,12 @@ export class CoordinatesController implements BasicSocketController {
     const coordLength = geoRoute.coordinates.length;
     if (coordLength === 0) return;
 
-    // (function loop(i: number) {
-    //   setTimeout(() => {}, interval * 1000);
-    // })(coordLength);
+    (function loop(i: number, socket: socketio.Socket) {
+      setTimeout(() => {
+        socket.emit("coordinates", geoRoute.coordinates[coordLength - i]);
+        i--;
+        loop(i, socket);
+      }, interval * 1000);
+    })(coordLength, this.socket);
   };
 }

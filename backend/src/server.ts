@@ -1,12 +1,13 @@
 import express from "express";
 import { Server } from "http";
 import * as socketio from "socket.io";
-import { connect } from "mongoose";
 import * as fs from "fs/promises";
+import { connect } from "mongoose";
 import path from "path";
 import { BasicController, BasicSocketController, GeoFeatureCollection, GeoLine } from "./interface";
 import errorMiddleware from "./middleware/error.middleware";
 import { GeoLineModel } from "./models/geo-data";
+import { CoordinatesController } from "./controllers/coordinates.controller";
 
 export default class App {
   public app: express.Application;
@@ -14,7 +15,7 @@ export default class App {
   public server: Server;
   public io: socketio.Server;
 
-  constructor(controllers: BasicController[], socketControllers: BasicSocketController[], port: number) {
+  constructor(controllers: BasicController[], port: number) {
     this.app = express();
     this.port = port || 5000;
     this.app.set("port", this.port);
@@ -24,7 +25,7 @@ export default class App {
     this.io.attach(this.server);
 
     this.initializeMiddlewares();
-    this.initializeControllers(this.io, controllers, socketControllers);
+    this.initializeControllers(controllers);
     this.initializeErrorHandling();
   }
 
@@ -82,22 +83,19 @@ export default class App {
     this.app.use(express.urlencoded({ extended: true }));
   }
 
-  private initializeControllers(
-    ioServer: socketio.Server,
-    controllers: BasicController[],
-    socketControllers: BasicSocketController[]
-  ) {
+  private initializeControllers(controllers: BasicController[]) {
     controllers.forEach((controller: BasicController) => {
       this.app.use("/api", controller.router);
     });
 
-    this.io.on("connection", (socket: socketio.Socket) => {
+    const onConnection = (socket: socketio.Socket) => {
       socket.emit("Connection to socket established");
 
-      socketControllers.forEach((controller: BasicSocketController) => {
-        controller.registerEvents(socket);
-      });
-    });
+      // new socket handlers are registered here
+      new CoordinatesController(this.io, socket).registerHandlers();
+    };
+
+    this.io.on("connection", onConnection);
   }
 
   public async listen() {
@@ -114,67 +112,6 @@ export default class App {
 }
 
 const port = parseInt(<string>process.env.PORT) || 5000;
-const app = new App([], [], port);
+const app = new App([], port);
 
 app.listen();
-
-// export default class App {
-//   public app: express.Application;
-//   public port: number;
-
-//   constructor(controllers: BasicController[], port: number) {
-//     this.app = express();
-//     this.port = port || 5000;
-
-//     this.initializeMiddlewares();
-//     this.initializeControllers(controllers);
-//     this.initializeErrorHandling();
-//   }
-
-//   private initializeErrorHandling() {
-//     this.app.use(errorMiddleware);
-//   }
-
-//   private async initializeDbConnection() {
-//     try {
-//       await new Mongoose().connect(<string>process.env.MONGO_URI);
-//       console.log("Connected to the database");
-//     } catch (error) {
-//       console.log("Unable to connect to db", error);
-//       process.exit(1);
-//     }
-//   }
-
-//   private initializeMiddlewares() {
-//     this.app.use(express.json());
-//     this.app.use(express.urlencoded({ extended: true }));
-//     this.app.use(cors({ origin: "*" })); // allow all just for now
-//   }
-
-//   private initializeControllers(controllers: BasicController[]) {
-//     controllers.forEach((controller: BasicController) => {
-//       this.app.use("/api", controller.router);
-//     });
-//   }
-
-//   private initSocket() {
-//     const io = new Server(this.app, {
-//       /* options */
-//     });
-
-//     io.on("connection", (socket) => {
-//       // ...
-//     });
-//   }
-
-//   public async listen() {
-//     try {
-//       await this.initializeDbConnection();
-//       this.app.listen(this.port, () => {
-//         console.log(`App listening on the port ${this.port}`);
-//       });
-//     } catch (error: any) {
-//       console.error(`Error occured: ${error.message}`);
-//     }
-//   }
-// }

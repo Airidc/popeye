@@ -9,7 +9,6 @@ services:
       - server
     volumes:
       - ./frontend:/app/frontend
-      - /app/frontend/node_modules
     ports:
       - 4000:4000
 
@@ -22,7 +21,6 @@ services:
       - database
     volumes:
       - ./backend:/app/backend
-      - /app/backend/node_modules
     ports:
       - 5000:5000
     environment:

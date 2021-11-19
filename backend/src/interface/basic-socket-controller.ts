@@ -1,3 +1,4 @@
+import * as socketio from "socket.io";
 export interface BasicSocketController {
-  registerEvents: (...args: any[]) => void;
+  registerHandlers: (io: socketio.Server, socket: socketio.Socket) => void;
 }
