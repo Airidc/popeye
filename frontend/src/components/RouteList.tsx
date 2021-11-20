@@ -1,4 +1,5 @@
-import React, { ReactElement, useState } from 'react'
+import '../styles/RouteList.css';
+import { ReactElement, useState } from 'react'
 import { GeoRoute, GeoRoutesEnum } from '../App'
 
 interface RouteListProps {
@@ -7,20 +8,22 @@ interface RouteListProps {
 }
 
 export default function RouteList({ routes, activeRoute }: RouteListProps): ReactElement {
+    const [isExpanded, setIsExpanded] = useState(false);
 
     return (
-        <div className="dropdown">
-            <span>Active route: {activeRoute}</span>
-            <input type="hidden" name="" value={activeRoute} />
-            {routes.map(route =>
-                <div
-                    key={route.routeText}
-                    className="dropdown--item"
-                    onClick={route.setActiveRoute}
-                >
-                    {route.routeText}
-                </div>
-            )}
+        <div className="dropdown" onClick={() => setIsExpanded(!isExpanded)}>
+            <span className="dropdown--active">{activeRoute}</span>
+            <div className={`dropdown--items ${isExpanded ? "" : "hidden"}`}>
+                {routes.map(route =>
+                    <div
+                        key={route.routeText}
+                        className="dropdown--item"
+                        onClick={route.setActiveRoute}
+                    >
+                        {route.routeText}
+                    </div>
+                )}
+            </div>
         </div>
     )
 }

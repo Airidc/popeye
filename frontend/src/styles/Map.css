@@ -1,0 +1,13 @@
+#map {
+  overflow: hidden;
+  width: 100vw;
+  max-width: 768px;
+  height: 350px;
+}
+
+@media only screen and (min-width: 768px) {
+  #map {
+    width: 50%;
+    min-width: 700px;
+  }
+}

@@ -1,0 +1,32 @@
+.dropdown {
+  position: relative;
+  margin-bottom: 2em;
+  width: 75%;
+  background-color: #282c34;
+  border: 3px solid skyblue;
+  border-radius: 4px;
+}
+
+.dropdown--active {
+  width: 100%;
+  padding: 1em 0;
+}
+
+.dropdown--items {
+  padding: 0.5em;
+  position: absolute;
+  width: 100%;
+  z-index: 9999;
+  background-color: #282c34;
+}
+
+.hidden {
+  display: none;
+}
+
+@media only screen and (min-width: 768px) {
+  .dropdown {
+    width: 50%;
+    max-width: 300px;
+  }
+}

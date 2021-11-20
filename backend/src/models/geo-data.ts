@@ -10,7 +10,7 @@ const routeObject = new Schema({
   },
   route: {
     type: String,
-    enum: ["Home to Work", "Work to Home", "Lunch"],
+    enum: ["Home To Work", "Work To Home", "Lunch"],
   },
   coordinates: [[{ type: [Number] }]],
 });

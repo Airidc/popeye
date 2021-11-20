@@ -11,6 +11,9 @@ services:
       - ./frontend:/app/frontend
     ports:
       - 4000:4000
+    environment:
+      - SOCKET_URL=http://server:5000/
+
 
   server:
     container_name: backend

@@ -22,7 +22,12 @@ export default class App {
 
     this.server = new Server(this.app);
     this.io = new socketio.Server();
-    this.io.attach(this.server);
+    this.io.attach(this.server, {
+      cors: {
+        origin: "*",
+        methods: ["GET", "POST"],
+      },
+    });
 
     this.initializeMiddlewares();
     this.initializeControllers(controllers);
@@ -55,12 +60,12 @@ export default class App {
     }
     const officeRouteJSON = JSON.parse(officeRouteRaw) as GeoFeatureCollection;
     const homeToOficeGeo = officeRouteJSON.features[0].geometry;
-    homeToOficeGeo.route = "Home to Work";
+    homeToOficeGeo.route = "Home To Work";
     const officeToDB = new GeoLineModel(homeToOficeGeo);
     officeToDB.save();
 
     const officeToHome = homeToOficeGeo;
-    officeToHome.route = "Work to Home";
+    officeToHome.route = "Work To Home";
 
     // Reverse coordinates for Work -> Home route
     let arrayLength = homeToOficeGeo.coordinates.length - 1;
