@@ -5,6 +5,11 @@
   height: 350px;
 }
 
+.leaflet-div-icon {
+  background: unset;
+  border: unset;
+}
+
 @media only screen and (min-width: 768px) {
   #map {
     width: 50%;

@@ -4,16 +4,43 @@
   width: 75%;
   background-color: #282c34;
   border: 3px solid skyblue;
+  color: skyblue;
   border-radius: 4px;
+  margin-top: 2em;
+
+  cursor: pointer;
+}
+
+.dropdown--controls {
+  display: flex;
 }
 
 .dropdown--active {
   width: 100%;
-  padding: 1em 0;
+  padding: 0.25em 0;
+}
+
+.dropdown--interval {
+  display: flex;
+  justify-items: stretch;
+}
+
+.dropdown--interval-item {
+  padding: 0.15em 0.75em;
+  border-left: 1px solid skyblue;
+  border-right: 1px solid skyblue;
+  background-color: #282c34;
+}
+
+.dropdown--interval-item.active {
+  background-color: skyblue;
+  color: #282c34;
 }
 
 .dropdown--items {
-  padding: 0.5em;
+  border: 3px solid skyblue;
+  padding: 0.25em 0;
+  left: -3px;
   position: absolute;
   width: 100%;
   z-index: 9999;
@@ -26,7 +53,7 @@
 
 @media only screen and (min-width: 768px) {
   .dropdown {
-    width: 50%;
-    max-width: 300px;
+    width: 75%;
+    max-width: 500px;
   }
 }

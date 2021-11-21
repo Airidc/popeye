@@ -5,7 +5,8 @@ import { GeoService } from "../services";
 export class CoordinatesController implements BasicSocketController {
   io: socketio.Server;
   socket: socketio.Socket;
-  cancelCurrentRoute = false;
+  streamInterval = 1;
+  routeStreamInterval: any;
 
   constructor(io: socketio.Server, socket: socketio.Socket) {
     this.io = io;
@@ -15,8 +16,9 @@ export class CoordinatesController implements BasicSocketController {
   registerHandlers() {
     try {
       this.socket.on("getCoordinates", this.getCoordinates);
-      this.socket.on("cancelCurrentRoute", () => {
-        this.cancelCurrentRoute = true;
+      this.socket.on("updateInterval", (interval: number) => {
+        // console.log("Updating interval ->", interval);
+        this.streamInterval = interval;
       });
     } catch (error) {
       this.socket.on("error", () => error);
@@ -24,28 +26,27 @@ export class CoordinatesController implements BasicSocketController {
   }
 
   private getCoordinates = async (route: string, interval: number) => {
-    if (this.cancelCurrentRoute) {
-      this.socket.emit("cancellingCurrentRoute");
-      return;
-    }
-    console.log("Route:", route);
+    // console.log("Route:", route);
     const geoRoute = await GeoService.getCoordinates(route);
     const coordLength = geoRoute.coordinates.length;
     if (coordLength === 0) return;
+    this.streamInterval = interval;
 
-    const loop = (i: number, socket: socketio.Socket) => {
-      setTimeout(() => {
-        if (i === -1) return;
-        if (this.cancelCurrentRoute) {
-          this.cancelCurrentRoute = false;
-          return;
-        }
-        socket.emit("coordinates", geoRoute.coordinates[coordLength - i]);
-        i--;
-        loop(i, socket);
-      }, interval * 1000);
-    };
+    // console.log("Coordinates length", coordLength);
+    for (var i = 0; i <= coordLength; i++) {
+      if (!this.socket.connected) {
+        // console.log("--[Socket closed] Returning from loop");
+        return;
+      }
 
-    loop(coordLength, this.socket);
+      await new Promise<void>((resolve, reject) => {
+        setTimeout(() => {
+          // console.log("Starting to stream coordinates");
+
+          this.socket.emit("coordinates", geoRoute.coordinates[i]);
+          resolve();
+        }, this.streamInterval * 1000);
+      });
+    }
   };
 }
