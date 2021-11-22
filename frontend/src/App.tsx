@@ -32,6 +32,7 @@ function App() {
     routeText: "Work To Home",
     setActiveRoute: () => setActiveRoute(GeoRoutesEnum.WORK_TO_HOME)
   }];
+
   const [activeRoute, setActiveRoute] = useState<GeoRoutesEnum | null>(null);
   const [dataInterval, setDataInterval] = useState(1);
   const [routeIsActive, setRouteIsActive] = useState(false);
@@ -41,7 +42,6 @@ function App() {
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    // console.log(ENDPOINT);
     setIsLoading(false);
     const s = socketIOClient(ENDPOINT, {
       'reconnection': true,
@@ -52,19 +52,16 @@ function App() {
     s.on("coordinates", data => {
       setIsLoading(false);
       if (!routeIsActive) setRouteIsActive(true);
-      // console.log("Setting new coordinates", data);
       setCoordinates(data);
     });
     return () => { s.disconnect(); }
   }, []);
 
   useEffect(() => {
-    // console.log("Updating interval ->", dataInterval);
     socket?.emit("updateInterval", dataInterval);
   }, [dataInterval])
 
   useEffect(() => {
-    // console.log(`Route changed: ${activeRoute}, update interval: ${updateInterval}`);
     if (socket) {
       if (routeIsActive) {
         socket.close();
@@ -72,13 +69,10 @@ function App() {
         socket.connect();
       }
       setIsLoading(true);
-      // console.log(`Route changed: ${activeRoute}, update interval: ${dataInterval}`);
 
       socket.emit("getCoordinates", activeRoute, dataInterval);
     }
   }, [activeRoute])
-
-
 
   return (
     <div className="App">

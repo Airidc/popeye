@@ -25,9 +25,7 @@ export default function Map({ coordinates, activeRoute }: MapProps): ReactElemen
         layers: [MAP_TILE]
     };
 
-    // This useEffect hook runs when the component is first mounted, 
-    // similar to componentDidMount() lifecycle method of class-based
-    // components:
+    // init all required elements
     useEffect(() => {
         const m = L.map("map", mapParams);
         setMap(m);
@@ -66,12 +64,14 @@ export default function Map({ coordinates, activeRoute }: MapProps): ReactElemen
         setMarker(mrker);
     }, []);
 
+    // Change icons for different route
     useEffect(() => {
         if (marker && activeRoute && walkIcon && driveIcon) {
             (activeRoute === GeoRoutesEnum.LUNCH) ? marker.setIcon(walkIcon) : marker.setIcon(driveIcon);
         }
     }, [activeRoute])
 
+    // Update marker to new coordinates
     useEffect(() => {
         if (map && marker && coordinates && coordinates.length !== 0) {
             // console.log("New coordinates", coordinates);

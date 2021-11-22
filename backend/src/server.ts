@@ -4,8 +4,7 @@ import * as socketio from "socket.io";
 import * as fs from "fs/promises";
 import { connect } from "mongoose";
 import path from "path";
-import { BasicController, BasicSocketController, GeoFeatureCollection, GeoLine } from "./interface";
-import errorMiddleware from "./middleware/error.middleware";
+import { BasicController, GeoFeatureCollection } from "./interface";
 import { GeoLineModel } from "./models/geo-data";
 import { CoordinatesController } from "./controllers/coordinates.controller";
 
@@ -31,11 +30,6 @@ export default class App {
 
     this.initializeMiddlewares();
     this.initializeControllers(controllers);
-    this.initializeErrorHandling();
-  }
-
-  private initializeErrorHandling() {
-    this.app.use(errorMiddleware);
   }
 
   private async initializeDbConnection() {
